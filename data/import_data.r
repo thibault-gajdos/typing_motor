@@ -27,4 +27,5 @@ for (name in filenames){
     }
     i = i + 1
 }
+save(data, file = 'typing_motor.dta')
  
