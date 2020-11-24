@@ -1,0 +1,92 @@
+#+title: preliminary analysis typing meta
+#+date: 
+#+author: 
+#+email: thibault.gajdos@univ-amu.fr
+#+PANDOC_OPTIONS: self-contained:t toc:t
+# clean output
+#+begin_src emacs-lisp :results none :exports none
+; (org-babel-map-src-blocks nil (org-babel-remove-result))
+#+end_src
+
+:options_LaTex:
+#+options: title:t date:t
+#+LATEX_HEADER: \RequirePackage[utf8]{inputenc}
+#+LATEX_HEADER: \graphicspath{{figures/}}
+#+LATEX_HEADER: \usepackage{hyperref}
+#+LATEX_HEADER: \hypersetup{
+#+LATEX_HEADER:     colorlinks,%
+#+LATEX_HEADER:     citecolor=black,%
+#+LATEX_HEADER:     filecolor=black,%
+#+LATEX_HEADER:     linkcolor=blue,%
+#+LATEX_HEADER:     urlcolor=black
+#+LATEX_HEADER: }
+#+LATEX_HEADER: \usepackage{hyperref}
+#+LATEX_HEADER: \usepackage[french]{babel}
+#+LATEX_HEADER: \usepackage[style = apa]{biblatex}
+#+LATEX_HEADER: \DeclareLanguageMapping{english}{english-apa}
+#+LATEX_HEADER: \newcommand\poscite[1]{\citeauthor{#1}'s (\citeyear{#1})}
+#+LATEX_HEADER: \addbibresource{~/thib/papiers/thib.bib}
+#+LATEX_HEADER: \usepackage[top=2cm,bottom=2.2cm,left=3cm,right=3cm]{geometry}
+:END:
+
+:Options_R:
+#+property: header-args:R  :session *R*
+#+property: header-args:R+ :tangle yes
+#+property: header-args :eval never-export
+:end:
+
+
+
+
+
+# ######################################################################
+#                END PREAMBLE
+# ######################################################################
+
+#+BEGIN_SRC R  :results silent :exports none
+  rm(list=ls(all=TRUE))  ## efface les données
+  source('~/thib/projects/tools/R_lib.r')
+  setwd("~/thib/projects/typing/data/")
+  load('data/typing_motor.dta')
+#+END_SRC
+
+#+BEGIN_SRC R :results output graphics :file accuarcy.png :exports results 
+  d <- data %>%
+    group_by(sujet, thiscondition) %>%
+    summarise(n = n(), accuracy = mean(acc))
+  plot.acc <- ggplot(data = d, aes(x = n, y = accuracy, color = thiscondition)) +
+    geom_point() +
+    geom_text_repel(aes(label = sujet)) 
+  plot.acc
+#+END_SRC
+
+#+RESULTS:
+[[file:accuarcy.png]]
+
+
+
+L'évolution du staircase. 
+
+#+BEGIN_SRC R :results output graphics :file staircase.png :exports results 
+  plot.staircase <- ggplot(data = data, aes(x = trial_index, y =  SC_SCval, group=thiscondition, colour=thiscondition )) +
+      geom_line() +
+      facet_wrap(sujet ~ .)
+  plot.staircase
+#+END_SRC
+
+#+RESULTS:
+[[file:staircase.png]]
+
+La distribution de la confiance par sujet et condition.
+
+#+BEGIN_SRC R :results output graphics :file conf.png :exports results 
+  plot.conf <- ggplot(data = data, aes(x = response)) +
+      geom_histogram(stat = "count") +
+      facet_grid(sujet  ~ thiscondition , scales = 'free')
+  plot.conf
+#+END_SRC
+
+#+RESULTS:
+[[file:conf.png]]
+
+
